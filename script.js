@@ -13,7 +13,7 @@ const vsSource = `
 
 const fsSource = `
     void main() {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
     }
   `;
 
@@ -35,11 +35,6 @@ function main() {
         );
         return;
     }
-
-    // Set clear color to black, fully opaque
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    // Clear the color buffer with specified clear color
-    gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Initialize a shader program; this is where all the lighting
     // for the vertices and so forth is established.
