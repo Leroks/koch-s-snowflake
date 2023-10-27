@@ -136,7 +136,6 @@ let point3 = { x: -0.5, y: -0.5 };
 vertices.push(point1, point2, point3)
 
 const centerOfTriangle = (point1.y + point2.y + point3.y) / 3;
-console.log(centerOfTriangle);
 
 addTriangles(point1, point2, vertices, 4, true)
 addTriangles(point2, point3, vertices, 4, true)
@@ -197,25 +196,3 @@ let transformMat2 = mul(translateMatrix2, mul(scaleMatrix2, translateMatrix1));
 gl.uniformMatrix3fv(transformMatLoc, true, transformMat2);
 gl.uniform3fv(colorLoc, colorWhite);
 gl.drawArrays(gl.TRIANGLES, 0, verticesFinal.length / 2);
-
-
-
-/*
-function rotatePoint(point, matrix) {
-    const x = point.x;
-    const y = point.y;
-    const newX = x * matrix[0][0] + y * matrix[0][1];
-    const newY = x * matrix[1][0] + y * matrix[1][1];
-    return { x: newX, y: newY };
-}
-
-function createRotationMatrix(angle) {
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    return [
-        cos, -sin, 0.0,
-        sin, cos, 0.0,
-        0.0, 0.0, 0.0
-    ];
-}
-*/
