@@ -135,6 +135,9 @@ let point2 = { x: 0.5, y: -0.5 };
 let point3 = { x: -0.5, y: -0.5 };
 vertices.push(point1, point2, point3)
 
+const centerOfTriangle = (point1.y + point2.y + point3.y) / 3;
+console.log(centerOfTriangle);
+
 addTriangles(point1, point2, vertices, 4, true)
 addTriangles(point2, point3, vertices, 4, true)
 addTriangles(point3, point1, vertices, 4, true)
@@ -157,13 +160,13 @@ gl.clear(gl.COLOR_BUFFER_BIT);
 
 let translateMatrix1 = [
     1.0, 0.0, 0.0,
-    0.0, 1.0, 0.21132,
+    0.0, 1.0, -centerOfTriangle,
     0.0, 0.0, 1.0
 ];
 
 let translateMatrix2 = [
     1.0, 0.0, 0.0,
-    0.0, 1.0, -0.21132,
+    0.0, 1.0, centerOfTriangle,
     0.0, 0.0, 1.0
 ];
 
@@ -174,8 +177,8 @@ let scaleMatrix1 = [
 ];
 
 let scaleMatrix2 = [
-    0.5, 0.0, 0,
-    0.0, 0.5, 0,
+    0.65, 0.0, 0,
+    0.0, 0.65, 0,
     0.0, 0.0, 1.0,
 ];
 
