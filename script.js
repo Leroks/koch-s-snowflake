@@ -8,11 +8,9 @@ if (!gl) {
 
 const vertexShaderSrc = `
     attribute vec2 position;
-    uniform mat3 translateMat;
-    uniform mat3 scaleMat;
-
+    uniform mat3 transformMat;
     void main() {
-        vec3 pos3D = translateMat * scaleMat  * vec3(position, 1.0);
+        vec3 pos3D = transformMat  * vec3(position, 1.0);
         gl_Position = vec4(pos3D, 1.0);
     }
 `;
@@ -50,6 +48,27 @@ if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     const info = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
     throw new Error('Could not link program:\n' + info);
+}
+
+// Function to multiply two matrices
+function mul(matrixA, matrixB) {
+    if (matrixA.length !== 9 || matrixB.length !== 9) {
+        console.error("Both matrices must be 3x3 matrices.");
+        return null;
+    }
+
+    const result = [];
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            let sum = 0;
+            for (let k = 0; k < 3; k++) {
+                sum += matrixA[i * 3 + k] * matrixB[k * 3 + j];
+            }
+            result.push(sum);
+        }
+    }
+
+    return result;
 }
 
 // Calculate the coordinates of the dividing points
@@ -109,6 +128,7 @@ function addTriangles(point1, point2, verticesOut, iteration, firstTime)
     }
 }
 
+
 vertices = []
 let point1 = { x: 0.0, y: 0.5 * Math.sqrt(3) - 0.5};
 let point2 = { x: 0.5, y: -0.5 };
@@ -135,46 +155,64 @@ gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 gl.clearColor(1.0, 1.0, 1.0, 1.0);
 gl.clear(gl.COLOR_BUFFER_BIT);
 
-let translateMatrix = [
+let translateMatrix1 = [
     1.0, 0.0, 0.0,
-    0.0, 1.0, 0.0,
+    0.0, 1.0, 0.21132,
     0.0, 0.0, 1.0
 ];
 
-let scaleMatrix = [
+let translateMatrix2 = [
+    1.0, 0.0, 0.0,
+    0.0, 1.0, -0.21132,
+    0.0, 0.0, 1.0
+];
+
+let scaleMatrix1 = [
     1.0, 0.0, 0,
     0.0, 1.0, 0,
     0, 0, 1,
 ];
+
+let scaleMatrix2 = [
+    0.5, 0.0, 0,
+    0.0, 0.5, 0,
+    0.0, 0.0, 1.0,
+];
+
 colorBlue = [0.0, 0.0, 0.8];
+colorWhite = [1.0, 1.0, 1.0];
 
-
-const scaleMatrixLoc = gl.getUniformLocation(program, 'scaleMat');
-const translateMatrixLoc = gl.getUniformLocation(program, 'translateMat');
+let transformMat1 = mul(translateMatrix2, mul(scaleMatrix1, translateMatrix1));
+const transformMatLoc = gl.getUniformLocation(program, 'transformMat');
 const colorLoc = gl.getUniformLocation(program, 'color');
 
-
-gl.uniformMatrix3fv(scaleMatrixLoc, false, scaleMatrix);
-gl.uniformMatrix3fv(translateMatrixLoc, false, translateMatrix);
+gl.uniformMatrix3fv(transformMatLoc, true, transformMat1);
 gl.uniform3fv(colorLoc, colorBlue);
 gl.drawArrays(gl.TRIANGLES, 0, verticesFinal.length / 2);
 
-
-scaleMatrix = [
-    0.68, 0.0, 0,
-    0.0, 0.68, 0,
-    0, 0, 1,
-];
-
-translateMatrix = [
-    1.0, 0.0, 0.0,
-    0.0, 1.0, -0.07,
-    0.0, 0.0, 1.0
-];
-
-colorWhite = [1.0, 1.0, 1.0];
-gl.uniformMatrix3fv(scaleMatrixLoc, false, scaleMatrix);
-gl.uniformMatrix3fv(translateMatrixLoc, true, translateMatrix);
+let transformMat2 = mul(translateMatrix2, mul(scaleMatrix2, translateMatrix1));
+gl.uniformMatrix3fv(transformMatLoc, true, transformMat2);
 gl.uniform3fv(colorLoc, colorWhite);
-
 gl.drawArrays(gl.TRIANGLES, 0, verticesFinal.length / 2);
+
+
+
+/*
+function rotatePoint(point, matrix) {
+    const x = point.x;
+    const y = point.y;
+    const newX = x * matrix[0][0] + y * matrix[0][1];
+    const newY = x * matrix[1][0] + y * matrix[1][1];
+    return { x: newX, y: newY };
+}
+
+function createRotationMatrix(angle) {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    return [
+        cos, -sin, 0.0,
+        sin, cos, 0.0,
+        0.0, 0.0, 0.0
+    ];
+}
+*/
